@@ -4,6 +4,20 @@
 
 ![소개_인사하는 사자](https://user-images.githubusercontent.com/81146131/221498526-e2db6afd-e36d-447c-ab58-58069793bedf.gif)
 
+## Studying
+Languages
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=Python&logoColor=white"/>
+<img src="https://img.shields.io/badge/C-A8B9CC?style=flat&logo=C&logoColor=white"/>
+
+Tools
+<img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white"/>
+<img src="https://img.shields.io/badge/Notion-3776AB?style=flat&logo=Notion&logoColor=white"/>
+<img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=Slack&logoColor=white"/>
+
+***
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=oro7l&layout=compact"><br><br>
+<img src="https://github-readme-stats.vercel.app/api?username=oro7l&show_icons=true">
+
 
 </div>
 
