@@ -3,8 +3,9 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 from .models import Post
-# Create your views here.
 
+
+#week3_standard
 def hello_world(request):
     if request.method == "GET":
         return JsonResponse({
@@ -13,8 +14,8 @@ def hello_world(request):
             'message' : '메시지 전달 성공!',
             'data' : "Hello world",
         })
-# Create your views here.
 
+#week3_challenge
 def code_reviewer_info(request):
     if request.method == "GET":
         return JsonResponse({
@@ -35,7 +36,8 @@ def code_reviewer_info(request):
             }
             ]
         })
-    
+
+#weeek4_standard   
 @require_http_methods(["GET"]) 
 def get_post_detail(request, id):
     post = get_object_or_404(Post, pk = id)
@@ -51,17 +53,22 @@ def get_post_detail(request, id):
         'data' : category_json
     })
 
+#week4_challenge
 @require_http_methods(["GET"]) 
 def get_post_all(request):
-    post = Post.objects.all()
-    category_json={
+    posts = Post.objects.all()
+    postList = []
+    
+    for post in posts:
+        postList.append({
         "id"    : post.post_id,
         "writer": post.writer,
         "content": post.content,
         "category" : post.category,
-    }
+    })
+        
     return JsonResponse({
         'status' : 200,
         'message' : '게시글 조회 성공',
-        'data' : category_json
+        'data' : postList
     })

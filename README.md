@@ -24,6 +24,10 @@ Tools
 
 ![2](https://user-images.githubusercontent.com/127576762/227777491-bbda4aaf-1e28-4a56-9283-4866b9182c9e.png)
 
+## 4주차 과제
+![챌린지 과제](https://user-images.githubusercontent.com/127576762/229818460-877f5477-9b89-40ff-aebf-0709ca1e8704.png)
+
+
 </div>
 
 ## 자기소개
