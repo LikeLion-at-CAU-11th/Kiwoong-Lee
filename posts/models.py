@@ -17,7 +17,7 @@ class Post(BaseModel):
         ('ETC', '기타')
     )
 
-    post_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     writer = models.CharField(verbose_name="작성자", max_length=30)
     content = models.TextField(verbose_name="내용")
     category = models.CharField(choices=CHOICES, max_length=20)
@@ -27,4 +27,5 @@ class Comment(BaseModel):
     writer = models.CharField(verbose_name="작성자", max_length=30)
     content = models.CharField(verbose_name="내용", max_length=200)
     post = models.ForeignKey(to=Post, on_delete=models.CASCADE, blank=False)
-    #CASCADE : post 삭제 시, 같이 삭제
+    # 부모 요소인 Post의 id값이 FK로 저장됨 -> 불러오려면 FK 활용
+    # CASCADE : post 삭제 시, 같이 삭제

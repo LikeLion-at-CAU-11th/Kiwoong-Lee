@@ -20,7 +20,7 @@ Tools
 
 ***
 ## 3주차 과제
-![1](https://user-images.githubusercontent.com/127576762/227777456-527b69b1-9b04-4c39-adf3-4b68171afcbb.png)
+<img src= https://user-images.githubusercontent.com/127576762/227777456-527b69b1-9b04-4c39-adf3-4b68171afcbb.png, width = "200", height = "400"/>
 
 ![2](https://user-images.githubusercontent.com/127576762/227777491-bbda4aaf-1e28-4a56-9283-4866b9182c9e.png)
 
