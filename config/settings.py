@@ -13,14 +13,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import json
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 secret_file = os.path.join(BASE_DIR, 'secrets.json') # secrets.json 파일 위치를 명시
 
 with open(secret_file) as f:
@@ -43,10 +39,6 @@ ALLOWED_HOSTS = [
     "http://localhost::3000",
 ]
 
-
-
-# Application definition
-
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,7 +59,6 @@ THIRD_PARTY_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
-AUTH_USER_MODEL = 'accounts.Member'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -86,6 +77,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
 
+]
+
+ALLOWED_HOSTS = [
+    "*",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -109,11 +104,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
-ALLOWED_HOSTS = [
-    "*",
-]
-
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
