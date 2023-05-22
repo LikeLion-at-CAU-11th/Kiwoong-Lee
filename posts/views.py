@@ -5,6 +5,12 @@ from django.views.decorators.http import require_http_methods
 from .models import Post, Comment
 import json
 
+from .serializers import PostSerializer 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status #상태코드, 500번대는 BE문제/400번대는 FE문제
+from django.http import Http404
+
 #week3_standard
 def hello_world(request):
     if request.method == "GET":
@@ -172,4 +178,43 @@ def create_comment(request,id):
         'data' : new_comment_json
         })
 
-       
+class PostList(APIView): #게시글 모델을 class형 view로 만듦, 이름이 중요하다! Post의 List를 담당하는 class의 코드   
+    #새로운 게시글 만드는 메소드 (통상 PostDetail이 아닌 List에 생성하더라 ~ )
+    def post(self, request, format=None): 
+        serializer = PostSerializer(data = request.data) #요청받은 data의 데이터를 data에 저장 후, 직렬화하는 과정
+        if serializer.is_valid(): #유효한 값을 받았을 때의 분기점 생성
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else :
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    #모든 게시글 가져오는 메소드
+    def get(self, request, format=None): 
+        posts = Post.objects.all() #쿼리셋 방식으로 모든 게시글 받아오기
+        #serializer를 활용하니까 일일이 받아올 필요 없이 다음과 같은 코드로 ㄱㄱ
+        serializer = PostSerializer(posts, many=True) #다중 값을 가져올 때 사용함
+        return Response(serializer.data)
+ 
+class PostDetail(APIView):
+    def get(self, request, id):
+        post = get_object_or_404(post, id=id) #get ~는 2개의 파라미터가 필요
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+    
+    #put은 전체 내용을 바꾸는 것, patch는 일부만 (패딩 패치 생각)
+    def put(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        serializer = PostSerializer(post, data=request.data) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else :
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, id):
+        post = get_object_or_404(post, id=id) #각 CRUD에서 다 post 가져오고 시작
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
