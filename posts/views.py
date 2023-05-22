@@ -15,7 +15,7 @@ def hello_world(request):
             'status' : 200,
             'success' : True,
             'message' : '메시지 전달 성공!',
-            'data': "Hello world",
+            'data': "Hello world"
         })
     
 
@@ -43,7 +43,6 @@ def create_post(request):
         'message': '게시글 목록 조회 성공',
         'data': new_post_json
     })
-
 
 @require_http_methods(["GET"])
 def get_post_all(request):
@@ -136,3 +135,4 @@ def get_comment(request, post_id):
         'message':'댓글 읽어오기 성공',
         'data':comment_json_list
     })
+
