@@ -48,78 +48,78 @@ def create_post(request):
         'data': new_post_json
     })
 
-# @require_http_methods(["GET"])
-# def get_post_all(request):
+@require_http_methods(["GET"])
+def get_post_all(request):
 
-# 		# Post 데이터베이스에 있는 모든 데이터를 불러와 queryset 형식으로 저장함
-#     post_all = Post.objects.all()
+		# Post 데이터베이스에 있는 모든 데이터를 불러와 queryset 형식으로 저장함
+    post_all = Post.objects.all()
     
-# 		# 각 데이터를 Json 형식으로 변환하여 리스트에 저장함
-#     post_json_all = []
-#     for post in post_all:
-#         post_json = {
-#             "id": post.id,
-#             "writer": post.writer,
-#             "category": post.category
-#         }
-#         post_json_all.append(post_json)
+		# 각 데이터를 Json 형식으로 변환하여 리스트에 저장함
+    post_json_all = []
+    for post in post_all:
+        post_json = {
+            "id": post.id,
+            "writer": post.writer,
+            "category": post.category
+        }
+        post_json_all.append(post_json)
     
-#     return JsonResponse({
-#         'status': 200,
-#         'message': '게시글 목록 조회 성공',
-#         'data': post_json_all
-#     })
+    return JsonResponse({
+        'status': 200,
+        'message': '게시글 목록 조회 성공',
+        'data': post_json_all
+    })
 
 
-# @require_http_methods(["GET", "PATCH", "DELETE"])
-# def post_detail(request, id):
-# 		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
-#     if request.method == "GET":
-#         post = get_object_or_404(Post, pk=id)
+@require_http_methods(["GET", "PATCH", "DELETE"])
+def post_detail(request, id):
+		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
+    if request.method == "GET":
+        post = get_object_or_404(Post, pk=id)
         
-#         post_json = {
-#             "id": post.id,
-#             "writer": post.writer,
-#             "content": post.content,
-#             "category": post.category,
-#         }
+        post_json = {
+            "id": post.id,
+            "writer": post.writer,
+            "content": post.content,
+            "category": post.category,
+        }
 
-#         return JsonResponse({
-#             'status': 200,
-#             'message': '게시글 조회 성공',
-#             'data': post_json
-#         })
+        return JsonResponse({
+            'status': 200,
+            'message': '게시글 조회 성공',
+            'data': post_json
+        })
 		
-# 		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
-#     elif request.method == "PATCH":
-#         body = json.loads(request.body.decode('utf-8'))
-#         update_post = get_object_or_404(Post, pk=id)
+		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
+    elif request.method == "PATCH":
+        body = json.loads(request.body.decode('utf-8'))
+        update_post = get_object_or_404(Post, pk=id)
 
-#         update_post.content = body['content']
-#         update_post.save()
+        update_post.content = body['content']
+        update_post.save()
 
-#         update_post_json = {
-#             "id": update_post.id,
-#             "writer": update_post.writer,
-#             "content": update_post.content,
-#             "category": update_post.category,
-#         }
+        update_post_json = {
+            "id": update_post.id,
+            "writer": update_post.writer,
+            "content": update_post.content,
+            "category": update_post.category,
+        }
 
-#         return JsonResponse({
-#             'status': 200,
-#             'message': '게시글 수정 성공',
-#             'data': update_post_json
-#         })
+        return JsonResponse({
+            'status': 200,
+            'message': '게시글 수정 성공',
+            'data': update_post_json
+        })
 
-#     elif request.method == "DELETE":
-#         delete_post = get_object_or_404(Post, pk=id)
-#         delete_post.delete()
+    elif request.method == "DELETE":
+        delete_post = get_object_or_404(Post, pk=id)
+        delete_post.delete()
 
-#         return JsonResponse({
-#                 'status': 200,
-#                 'message': '게시글 삭제 성공',
-#                 'data': None
-#         })
+        return JsonResponse({
+                'status': 200,
+                'message': '게시글 삭제 성공',
+                'data': None
+        })
 
 
 @require_http_methods(["GET"])
@@ -182,6 +182,7 @@ def get_comment(request, post_id):
 
 ##APIView
 class PostList(APIView):
+
     def post(self, request, format=None):
         serializer = PostSerializer(data = request.data)
         if serializer.is_valid():
@@ -213,14 +214,18 @@ class PostDetail(APIView):
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-##Mixin
-from rest_framework import mixins, generics
+from rest_framework import mixins
+from rest_framework import generics
 
-class PostListMixins (mixins.ListModelMixin, generics.GenericAPIView):
+class PostListMixins(mixins.ListModelMixin,mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
     def get(self, request, *args, **kwargs):
         return self.list(request)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 class PostDetailMixins(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Post.objects.all()
@@ -228,12 +233,13 @@ class PostDetailMixins(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixin
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
+    
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
         
     def delete(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
+        return self.destroy(request, *args, **kwargs)
+    
 
 ##Generics APIView
 class PostListGenericAPIView(generics.ListCreateAPIView):
@@ -244,7 +250,8 @@ class PostDetailGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-##ViewSet
+
+#############viewset
 from rest_framework import viewsets
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -252,13 +259,13 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
 # post_list = PostViewSet.as_view({
-#     'get': 'list',
-#     'post': 'create',
+#     'get':'list',
+#     'post':'create'
 # })
 
-# post_detail = PostViewSet.as_view({
-#     'get': 'retrieve',
-#     'put': 'update',
-#     'patch': 'partial_update',
-#     'delete': 'destroy',
+# post_detail_vs = PostViewSet.as_view({
+#     'get':'retrieve',
+#     'put':'update',
+#     'patch':'partial_update',
+#     'delete':'destroy'
 # })
