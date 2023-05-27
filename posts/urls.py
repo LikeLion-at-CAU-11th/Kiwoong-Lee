@@ -17,6 +17,15 @@ urlpatterns = [
     path('<int:pk>/', PostDetailGenericAPIView.as_view()),
 ]
 
+# urlpatterns = [
+#     path('', post_list),
+#     path('<int:pk>/', post_detail_vs)
+# ]
+
+
+router = DefaultRouter()
+router.register('', PostViewSet)
+
 # router = DefaultRouter()
 # router.register('',PostViewSet)
 
