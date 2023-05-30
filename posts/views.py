@@ -7,6 +7,15 @@ import json
 
 from .serializers import PostSerializer 
 from rest_framework.views import APIView
+'''
+1. APIView : 기본적인 클래스 뷰, http 메소드 별로 로직을 함수로 구현
+2. GenericAPIView : 1을 상속받은 뷰 클래스, 단독 사용보단 concrete generic view 나 mixin과 결합하여 사용 
+        *mixins : 반복적으로 serializer 사용 안하도 되게 다 구현되어 있음 (queryset, serializer 해야 함) 
+        *concrete generic views : 상속받아야 하는게 넘 많아서 하나로 (queryset, serializer 해야 함)
+3. ViewSet : 헬퍼클래스
+        *ReadOnlyModelViewSet : 특정 레코드 조회용, 속도 빨라짐
+        *ModelViewSet : 다른것도 해야할 때
+        '''
 from rest_framework.response import Response
 from rest_framework import status #상태코드, 500번대는 BE문제/400번대는 FE문제
 from django.http import Http404
@@ -180,9 +189,14 @@ def create_comment(request,id):
 
 class PostList(APIView): #게시글 모델을 class형 view로 만듦, 이름이 중요하다! Post의 List를 담당하는 class의 코드   
     #새로운 게시글 만드는 메소드 (통상 PostDetail이 아닌 List에 생성하더라 ~ )
+    
+    #authentication_classes = [] 다음 시간에
+    
     def post(self, request, format=None): 
         serializer = PostSerializer(data = request.data) #요청받은 data의 데이터를 data에 저장 후, 직렬화하는 과정
         if serializer.is_valid(): #유효한 값을 받았을 때의 분기점 생성
+            # 역질렬화 과정이 필요할 때 유효성 검사가 필요
+            # create, update
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else :
@@ -217,4 +231,60 @@ class PostDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+from rest_framework import mixins
+from rest_framework import generics
+#전체
+class PostListMixins(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request)
+    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+#단일객체
+class PostDetailMixins(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+    
+
+######################genericsAPIView
+
+class PostListGenericAPIView(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+ 
+class PostDetailGenericAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+
+####################viewset
+from rest_framework import viewsets
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+post_list = PostViewSet.as_view({
+    'get' : 'list',
+    'post' : 'create',    
+})
+
+post_detail_vs = PostViewSet.as_view({
+    'get' : 'retrieve',
+    'put' : 'update',
+    'patch': 'partial_update',
+    'delete' : 'destroy'
+})
