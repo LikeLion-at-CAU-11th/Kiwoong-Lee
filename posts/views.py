@@ -20,6 +20,9 @@ from rest_framework.response import Response
 from rest_framework import status #상태코드, 500번대는 BE문제/400번대는 FE문제
 from django.http import Http404
 
+#######인가구현 로그인한 사용자가 글 작성을 할 수 있도록, 로그인 안한 사용자는 읽기만 가능하게
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
 #week3_standard
 def hello_world(request):
     if request.method == "GET":
@@ -191,6 +194,9 @@ class PostList(APIView): #게시글 모델을 class형 view로 만듦, 이름이
     #새로운 게시글 만드는 메소드 (통상 PostDetail이 아닌 List에 생성하더라 ~ )
     
     #authentication_classes = [] 다음 시간에
+    ##########인가구현
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     
     def post(self, request, format=None): 
         serializer = PostSerializer(data = request.data) #요청받은 data의 데이터를 data에 저장 후, 직렬화하는 과정
@@ -277,14 +283,15 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-post_list = PostViewSet.as_view({
-    'get' : 'list',
-    'post' : 'create',    
-})
+# post_list = PostViewSet.as_view({
+#     'get' : 'list',
+#     'post' : 'create',    
+# })
 
-post_detail_vs = PostViewSet.as_view({
-    'get' : 'retrieve',
-    'put' : 'update',
-    'patch': 'partial_update',
-    'delete' : 'destroy'
-})
+# post_detail_vs = PostViewSet.as_view({
+#     'get' : 'retrieve',
+#     'put' : 'update',
+#     'patch': 'partial_update',
+#     'delete' : 'destroy'
+# })
+

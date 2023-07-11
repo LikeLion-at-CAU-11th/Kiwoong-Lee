@@ -36,5 +36,6 @@ router = DefaultRouter()
 router.register('', PostViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    #path('', include(router.urls)),
+    path('',PostList.as_view()),
 ]

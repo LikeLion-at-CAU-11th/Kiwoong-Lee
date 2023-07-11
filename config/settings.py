@@ -13,6 +13,7 @@ from pathlib import Path
 import os
 import json
 from django.core.exceptions import ImproperlyConfigured
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,9 +64,27 @@ PROJECT_APPS = [
 THIRD_PARTY_APPS = [
     'corsheaders',#cors설정 시 사용자를 보호하면서 다른 도메인에 필요한 리소스 요청 가능
     'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework_simplejwt.authentication.JWTAuthentication', #여러 개 사용 가능하지만, 우리는 simplejwt 사용
+        #인증에 사용될 기본을 설정?
+    ),
+}
+
+REST_USE_JWT = True
+
+SIMPLE_JWT = { #simple jwt의 옵션을 설정
+    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=3), #access token의 유효기간을 3시간으로 설정
+    'REFRESH_TOKEN_LIFETIME' : timedelta(days=7), #refresh token의 유효기간을 설정 보통 1~2주
+    'ROTATE_REFRESH_TOKENS' : False, #true일 때 반환해줌
+    'BLACKLIST_AFTER_ROTATION' : False, #true일 때 같은 refresh token이 반환되지 않도록 함
+    'TOKEN_USER_CLASS' : 'accounts.Member', #JWT 인증 사용할 때 사용자 클래스를 연결 (보통은 user 우리가 만든게 member라 member로)
+    }
 
 AUTH_USER_MODEL = 'accounts.Member'
 
