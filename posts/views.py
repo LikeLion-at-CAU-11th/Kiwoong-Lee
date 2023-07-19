@@ -49,8 +49,7 @@ def create_post(request):
         'data': new_post_json
     })
 
-@require_http_methods(["GET"])
-def get_post_all(request):
+
 @require_http_methods(["GET"])
 def get_post_all(request):
 
@@ -90,11 +89,6 @@ def get_post_all(request):
     })
 
 
-@require_http_methods(["GET", "PATCH", "DELETE"])
-def post_detail(request, id):
-		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
-    if request.method == "GET":
-        post = get_object_or_404(Post, pk=id)
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def post_detail(request, id):
 		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
@@ -125,10 +119,7 @@ def post_detail(request, id):
             'data': post_json
         })
 		
-		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
-    elif request.method == "PATCH":
-        body = json.loads(request.body.decode('utf-8'))
-        update_post = get_object_or_404(Post, pk=id)
+	
 		# 요청 메소드가 GET일 때는 게시글을 조회하는 View가 동작하도록 함
     elif request.method == "PATCH":
         body = json.loads(request.body.decode('utf-8'))
@@ -163,9 +154,7 @@ def post_detail(request, id):
             'data': update_post_json
         })
 
-    elif request.method == "DELETE":
-        delete_post = get_object_or_404(Post, pk=id)
-        delete_post.delete()
+
     elif request.method == "DELETE":
         delete_post = get_object_or_404(Post, pk=id)
         delete_post.delete()
@@ -279,7 +268,6 @@ from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import generics
 
-class PostListMixins(mixins.ListModelMixin,mixins.CreateModelMixin, generics.GenericAPIView):
 class PostListMixins(mixins.ListModelMixin,mixins.CreateModelMixin, generics.GenericAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
