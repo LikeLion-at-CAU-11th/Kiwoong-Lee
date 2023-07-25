@@ -54,6 +54,9 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #소셜로그인 site 설정
+    'django.contrib.sites',
 ]
 
 PROJECT_APPS = [
@@ -65,9 +68,26 @@ THIRD_PARTY_APPS = [
     'corsheaders',#cors설정 시 사용자를 보호하면서 다른 도메인에 필요한 리소스 요청 가능
     'rest_framework',
     'rest_framework_simplejwt',
+
+     # 소셜로그인 라이브러리
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # allauth.socialaccount.providers.{소셜로그인제공업체}
+    # {소셜로그인제공업체} 부분에는 구글 외에도 카카오,네이버 추가 가능
+    'allauth.socialaccount.providers.google', #admin 페이지에서 social application 드롭박스에 생성됨 
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
+
+# django.contrib.sites는 multi sites 기능을 지원해 주는 것을 뜻한다. 
+# 하나의 사이트에서 여러 domain을 가질 수 있는 기능인데, 
+# 사이트는 1개만 사용할 것이라고 강제로 명시 **그냥 무조건 1로 하는듯(?)
+SITE_ID = 1
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':(
@@ -78,6 +98,7 @@ REST_FRAMEWORK = {
 
 REST_USE_JWT = True
 
+
 SIMPLE_JWT = { #simple jwt의 옵션을 설정
     'ACCESS_TOKEN_LIFETIME' : timedelta(hours=3), #access token의 유효기간을 3시간으로 설정
     'REFRESH_TOKEN_LIFETIME' : timedelta(days=7), #refresh token의 유효기간을 설정 보통 1~2주
@@ -86,7 +107,14 @@ SIMPLE_JWT = { #simple jwt의 옵션을 설정
     'TOKEN_USER_CLASS' : 'accounts.Member', #JWT 인증 사용할 때 사용자 클래스를 연결 (보통은 user 우리가 만든게 member라 member로)
     }
 
+
+
 AUTH_USER_MODEL = 'accounts.Member'
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username' # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
