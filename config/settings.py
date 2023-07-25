@@ -10,8 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from pathlib import Path
-import os
-import json
+import os, json
 from django.core.exceptions import ImproperlyConfigured
 from datetime import timedelta
 
@@ -49,12 +48,13 @@ ALLOWED_HOSTS = [
 
 DJANGO_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.auth',
+    'django.contrib.messages',
+    
     #소셜로그인 site 설정
     'django.contrib.sites',
 ]
@@ -89,6 +89,13 @@ INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 # 사이트는 1개만 사용할 것이라고 강제로 명시 **그냥 무조건 1로 하는듯(?)
 SITE_ID = 1
 
+AUTHENTICAITON_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', #기존 장고 인증기능
+    'allauth.account.auth_backends.AuthenticationBackend', #소셜로그인기능
+]
+
+LOGIN_REDIRECT_URL = '/'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':(
         'rest_framework_simplejwt.authentication.JWTAuthentication', #여러 개 사용 가능하지만, 우리는 simplejwt 사용
@@ -108,12 +115,11 @@ SIMPLE_JWT = { #simple jwt의 옵션을 설정
     }
 
 
-
 AUTH_USER_MODEL = 'accounts.Member'
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username' # username 필드 사용 x
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email' # username 필드 사용 x
 ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
-ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_USERNAME_REQUIRED = True    # username 필드 사용 x
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 MIDDLEWARE = [

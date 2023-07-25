@@ -83,8 +83,25 @@ class AuthView(APIView):
         return res
     
 
-# views.py
+# 11주차 OAuth 소셜로그인
 from django.shortcuts import redirect
+import os, json
+from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+secret_file = os.path.join(BASE_DIR, 'secrets.json') # secrets.json 파일 위치를 명시
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
 
 # 구글 소셜로그인 변수 설정
 BASE_URL = 'http://localhost:8000/' 
@@ -108,8 +125,8 @@ from allauth.socialaccount.models import SocialAccount
 #access token을 얻기 위해 다음 4개가 필요함.
 def google_callback(request):
     client_id = '339060715424-1cuu8j7hkkkf79u0l4ukr122qdu2f6fp.apps.googleusercontent.com'
-    client_secret = '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'
-    code = request.GET.get('code') #인가코드
+    client_secret = get_secret("CLIENT_SECRETS")
+    code = request.GET.get('code') #인가코드, 아이디 비번 맞으면 발급됨
     state = "random_state"
 
     # 1. 받은 코드로 구글에 access token 요청
