@@ -61,9 +61,10 @@ PROJECT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+
     'corsheaders',#cors설정 시 사용자를 보호하면서 다른 도메인에 필요한 리소스 요청 가능
     'rest_framework',
-]
+
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
@@ -78,7 +79,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
-]
+
 
 CORS_ALLOWED_CREDENTIALS = True
 
