@@ -80,16 +80,45 @@ class AuthView(APIView):
 
 # views.py
 from django.shortcuts import redirect
+from pathlib import Path
+import os, json
+from django.core.exceptions import ImproperlyConfigured
+from datetime import timedelta
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+secret_file = os.path.join(BASE_DIR, 'secrets.json') # secrets.json 파일 위치를 명시
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
 
 # 구글 소셜로그인 변수 설정
 BASE_URL = 'http://localhost:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'accounts/google/callback/'
 
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from allauth.socialaccount.providers.google import views as google_view
+
+# 구글 소셜로그인 view
+class GoogleLogin(SocialLoginView):
+    adapter_class = google_view.GoogleOAuth2Adapter
+    callback_url = GOOGLE_CALLBACK_URI
+    client_class = OAuth2Client
+
 # 구글 로그인
 def google_login(request):
-    scope = "https://www.googleapis.com/auth/userinfo.email " + \
-            "https://www.googleapis.com/auth/drive.readonly"
-    client_id = '46558353165-r0vpjuocufu82le0u9sh08ei818pvsse.apps.googleusercontent.com'
+    scope = "https://www.googleapis.com/auth/userinfo.email "# + \
+            #"https://www.googleapis.com/auth/drive.readonly"
+    client_id = '339060715424-1cuu8j7hkkkf79u0l4ukr122qdu2f6fp.apps.googleusercontent.com'
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 from json import JSONDecodeError
@@ -99,8 +128,8 @@ from .models import *
 from allauth.socialaccount.models import SocialAccount
 
 def google_callback(request):
-    client_id = '46558353165-r0vpjuocufu82le0u9sh08ei818pvsse.apps.googleusercontent.com'
-    client_secret = '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'
+    client_id = '339060715424-1cuu8j7hkkkf79u0l4ukr122qdu2f6fp.apps.googleusercontent.com'
+    client_secret = get_secret("CLIENT_SECRETS")
     code = request.GET.get('code')
     state = "random_state"
 
@@ -118,6 +147,7 @@ def google_callback(request):
 
     ### 1-3. 성공 시 access_token 가져오기
     access_token = token_req_json.get('access_token')
+    id_token = token_req_json.get('id_token')
 
     #################################################################
 
@@ -150,8 +180,8 @@ def google_callback(request):
             return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
 
         # 이미 Google로 제대로 가입된 유저 => 로그인 & 해당 우저의 jwt 발급
-        data = {'access_token': access_token, 'code': code}
-        accept = requests.post(f"{BASE_URL}api/user/google/login/finish/", data=data)
+        data = {'access_token': id_token, 'code': code} #id_token 확인
+        accept = requests.post(f"{BASE_URL}accounts/google/login/finish/", data=data) #url 수정
         accept_status = accept.status_code
 
         # 뭔가 중간에 문제가 생기면 에러
@@ -164,8 +194,8 @@ def google_callback(request):
 
     except Member.DoesNotExist:
         # 전달받은 이메일로 기존에 가입된 유저가 아예 없으면 => 새로 회원가입 & 해당 유저의 jwt 발급
-        data = {'access_token': access_token, 'code': code}
-        accept = requests.post(f"{BASE_URL}api/user/google/login/finish/", data=data)
+        data = {'access_token': id_token, 'code': code} #id_token 확인
+        accept = requests.post(f"{BASE_URL}accounts/google/login/finish/", data=data) #url 수정
         accept_status = accept.status_code
 
         # 뭔가 중간에 문제가 생기면 에러
