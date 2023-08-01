@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
 from pathlib import Path
 import os
 import json
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -61,8 +61,10 @@ PROJECT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'corsheaders', #cors설정 시 사용자를 보호하면서 다른 도메인에 필요한 리소스 요청 가능
-]
+
+    'corsheaders',#cors설정 시 사용자를 보호하면서 다른 도메인에 필요한 리소스 요청 가능
+    'rest_framework',
+
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
@@ -77,14 +79,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
-]
 
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [ 
+CORS_ALLOWED_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-]
+    ]
+
 
 ROOT_URLCONF = 'config.urls'
 
