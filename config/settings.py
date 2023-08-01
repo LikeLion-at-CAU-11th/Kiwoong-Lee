@@ -40,6 +40,7 @@ ALLOWED_HOSTS = [
     "http://localhost::3000",
 ]
 
+#기본 앱
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,11 +52,13 @@ DJANGO_APPS = [
     'django.contrib.sites',
 ]
 
+#내가 만든 앱
 PROJECT_APPS = [
     "posts",
     "accounts",
 ]
 
+#추가 기능 사용을 위해 다운받은 앱
 THIRD_PARTY_APPS = [
     "corsheaders",
     'rest_framework',
@@ -72,11 +75,16 @@ THIRD_PARTY_APPS = [
     # allauth.socialaccount.providers.{소셜로그인제공업체}
     # {소셜로그인제공업체} 부분에는 구글 외에도 카카오,네이버 추가 가능
     'allauth.socialaccount.providers.google',
+
+    #S3연결
+    'storages',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
 
-# 사이트는 1개만 사용할 것이라고 명시
+# django.contrib.sites는 multi sites 기능을 지원해 주는 것을 뜻한다. 
+# 하나의 사이트에서 여러 domain을 가질 수 있는 기능인데, 
+# 사이트는 1개만 사용할 것이라고 강제로 명시 **그냥 무조건 1로 하는듯(?)
 SITE_ID = 1
 
 # 나중에 dj_rest_auth.registration.views.SocialLoginView을 쓰기위해 추가
@@ -135,12 +143,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -195,10 +203,43 @@ REST_FRAMEWORK = {
 
 REST_USE_JWT = True
 
+
+#Simple JWT 옵션 설정
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=3),    # 유효기간 3시간
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # 유효기간 7일
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
-    'TOKEN_USER_CLASS': 'accounts.Member',
+    'ROTATE_REFRESH_TOKENS': False, #true일 때 반환해줌
+    'BLACKLIST_AFTER_ROTATION': False,  #true일 때 같은 refresh token이 반환되지 않도록 함
+    'TOKEN_USER_CLASS': 'accounts.Member',  #JWT 인증 사용할 때 사용자 클래스를 연결 (보통은 user 우리가 만든게 member라 member로)
 }
+
+# DB 연결
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': 'likelion11th',
+		'USER': 'admin',
+		'PASSWORD': get_secret("DB_PASSWORD"),
+		'HOST': get_secret("DB_HOST"),
+		'PORT': '3306', #mysql은 3306 포트를 사용합니다
+	}
+}
+
+# AWS 정보
+AWS_ACCESS_KEY_ID = get_secret("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = get_secret("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = 'ap-northeast-2'
+AWS_STORAGE_BUCKET_NAME = 'backendsession'
+
+# AWS S3 버킷의 URL
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME,AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_S3_HOST = 's3.ap-northeast-2.amazonaws.com'
+AWS_QUERYSTRING_AUTH = False
+
+# 장고의 기본 저장 시스템 클래스를 지정해주는 설정
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
